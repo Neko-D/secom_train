@@ -1,0 +1,17 @@
+#  核心机器学习
+numpy==2.4.6
+pandas==3.0.3
+scipy==1.17.1
+scikit-learn==1.8.0
+imbalanced-learn==0.14.1
+xgboost==3.2.0
+
+# 可视化 
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# 可解释性分析 
+shap==0.51.0
+
+# Jupyter 环境
+jupyter>=1.0,<2.0
