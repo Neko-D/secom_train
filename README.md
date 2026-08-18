@@ -23,7 +23,7 @@
 | 项目 | 内容 |
 |------|------|
 | 数据来源 | SECOM 公开数据集（UCI Machine Learning Repository） |
-| 样本数 | 1567（=1511 有效样本 + 56 被移除异常样本） |
+| 样本数 | 1567（全部保留，未删除样本） |
 | 原始传感器特征数 | 590 列 |
 | 标签列 | 1 列（−1=良品 / 1=失效） |
 | 良品样本 | 约 1463 个 |
@@ -90,7 +90,7 @@
   -> 训练集 fit ANOVA 特征选择
   -> 多模型、多采样、多种子搜索
   -> 验证集选择阈值和最终方案
-  -> 只训练并保存最终 5-seed ensemble 模型
+  -> 只训练并保存最终 10-seed ensemble 模型
   -> 测试集一次性最终评估
   -> 复用最终模型计算 ensemble SHAP 与 CV 分析
 ```
@@ -116,7 +116,6 @@
 | 训练集 | 1096 × 312 |
 | 验证集 | 157 × 312 |
 | 测试集 | 314 × 312 |
-
 
 ## 7. 特征选择计划
 
@@ -167,10 +166,11 @@
 
 ## 10. 集成、校准与保存策略
 
-进行Stacking 与简单平均集成的比较，并与最优单模型进行对比。
+进行 Stacking 与简单平均集成的比较，并与最优单模型进行对比。
+> 注：在严格时间切分下，Stacking（L1-LR）验证集 G-Mean 仅约 0.45，明显低于最佳单模型（约 0.65）和简单平均（约 0.55），因此最终方案仍采用单模型 ensemble，Stacking 仅作为对照实验。
+
 搜索阶段：不保存所有临时模型，只保留概率、指标、阈值和配置。
-最终阶段：只训练并保存最优模型的 5 个 seed 模型。
-```
+最终阶段：只训练并保存最优模型的 10 个 seed 模型。
 
 最终模型文件为：
 
@@ -178,7 +178,7 @@
 secom_final_model_ensemble.joblib
 ```
 
-该文件保存 5 个最终模型、阈值、特征元数据和最终指标。为避免自定义预处理器反序列化问题，文件中不保存自定义预处理对象；如需部署成从原始数据到预测的一键流水线，后续应将预处理类拆成稳定模块后再封装完整 pipeline。
+该文件保存 10 个最终模型、阈值、特征元数据和最终指标。为避免自定义预处理器反序列化问题，文件中不保存自定义预处理对象；如需部署成从原始数据到预测的一键流水线，后续应将预处理类拆成稳定模块后再封装完整 pipeline。
 
 ## 11. 最终评估方案
 
@@ -212,7 +212,7 @@ secom_final_model_ensemble.joblib
 | `viz_v8_roc_pr_top6.png` | 验证集 Top-6 ROC/PR 曲线 |
 | `secom_v8_final.png` | 测试集 ROC/PR 曲线 |
 | `viz_v8_confusion_calibration.png` | 混淆矩阵与校准曲线 |
-| `viz_v8_shap_importance.png` | Ensemble SHAP Top-20 重要性 |
+| `viz_v8_shap_summary.png` | Ensemble SHAP Summary 图（含 Top-20 重要性） |
 | `viz_v8_shap_summary.png` | Ensemble SHAP Summary 图 |
 | `viz_v8_cv_distribution.png` | CV 分布 |
 | `viz_v8_cv_shap_scatter.png` | CV 与 SHAP 散点 |
